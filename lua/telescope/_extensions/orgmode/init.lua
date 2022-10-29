@@ -2,7 +2,13 @@ local orgmode = require('orgmode.api')
 
 local pickers = require("telescope.pickers")
 local finders = require("telescope.finders")
+local entry_display = require("telescope.pickers.entry_display")
 local conf = require("telescope.config").values
+
+-- TODO: include headline.level and headline.is_archived() as part of the
+-- public orgmode api
+-- TODO: add highlight groups
+-- TODO: add action to refile/capture
 
 local function get_entries(opts)
 
@@ -33,8 +39,6 @@ local function get_entries(opts)
                     filename = file_entry.filename,
                     headline = headline
                 }
-
-                assert(headline.position.start_line == headline._section.line_number)
                 table.insert(results, entry)
             end
         end
@@ -46,32 +50,44 @@ end
 local function search_headings(opts)
     opts = opts or {}
 
+    local displayer = entry_display.create({
+        separator = ' ',
+        items = {
+            { width = vim.F.if_nil(opts.location_width, 20) },
+            { remaining = true }
+        }
+    })
+
+    local function make_display(entry)
+        return displayer({ entry.location, entry.line })
+    end
+
     pickers.new(opts, {
         prompt_title = "Search Headings",
         finder = finders.new_table {
             results = get_entries(opts),
-            entry_maker = opts.entry_maker or function (entry)
+            entry_maker = opts.entry_maker or function(entry)
 
                 local headline = entry.headline
 
-                local display = entry.filename
                 local lnum = nil
+                local location = vim.fn.fnamemodify(entry.filename, ':t')
+                local line = ""
 
                 if headline then
                     lnum = headline.position.start_line
-
-                    local text = string.format('%s %s', string.rep('*', headline._section.level), headline.title)
-                    local line =  string.format('%s:%i:%s', entry.filename, lnum, text)
-                    display = line
-
+                    location = string.format('%s:%i', location, lnum)
+                    line = string.format('%s %s', string.rep('*', headline._section.level), headline.title)
                 end
 
                 return {
-                    value = display,
-                    ordinal = display,
-                    display = display,
+                    value = entry,
+                    ordinal = location .. ' ' .. line,
                     filename = entry.filename,
-                    lnum = lnum
+                    lnum = lnum,
+                    display = make_display,
+                    location = location,
+                    line = line
                 }
             end,
         },
@@ -81,7 +97,7 @@ local function search_headings(opts)
 end
 
 return require("telescope").register_extension {
-  exports = {
-    search_headings = search_headings
-  },
+    exports = {
+        search_headings = search_headings,
+    },
 }
