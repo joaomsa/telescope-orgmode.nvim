@@ -4,6 +4,7 @@ local conf = require("telescope.config").values
 local action_set = require("telescope.actions.set")
 local actions = require("telescope.actions")
 local action_state = require("telescope.actions.state")
+local state = require("telescope.state")
 
 local utils = require('orgmode-telescope.utils')
 
@@ -49,27 +50,30 @@ return function(opts)
     end
   end
 
-  local current_depth = opts.max_depth
-  local next_depth = nil
-  if current_depth ~= 0 then
-    next_depth = 0
-  end
+  local function gen_depth_toggle(opts, prompt_bufnr)
 
-  local function depth_toggle(prompt_bufnr)
-    local current_picker = action_state.get_current_picker(prompt_bufnr)
+    local status = state.get_status(prompt_bufnr)
+    status._ot_current_depth = opts.max_depth
+    status._ot_next_depth = nil
+    if status._ot_current_depth ~= 0 then
+      status._ot_next_depth = 0
+    end
 
-    -- TODO: use action_state to store these to allow easy rebinding by users
-    local aux = current_depth
-    current_depth = next_depth
-    next_depth = aux
+    return function()
+      local current_picker = action_state.get_current_picker(prompt_bufnr)
 
-    opts.max_depth = current_depth
-    local new_finder = finders.new_table {
-      results = utils.get_entries(opts),
-      entry_maker = opts.entry_maker or utils.make_entry(opts),
-    }
+      local aux = status._ot_current_depth
+      status._ot_current_depth = status._ot_next_depth
+      status._ot_next_depth = aux
 
-    current_picker:refresh(new_finder, opts)
+      opts.max_depth = status._ot_current_depth
+      local new_finder = finders.new_table {
+        results = utils.get_entries(opts),
+        entry_maker = opts.entry_maker or utils.make_entry(opts),
+      }
+
+      current_picker:refresh(new_finder, opts)
+    end
   end
 
   pickers.new(opts, {
@@ -82,9 +86,9 @@ return function(opts)
     },
     sorter = conf.generic_sorter(opts),
     previewer = conf.grep_previewer(opts),
-    attach_mappings = function(_, map)
+    attach_mappings = function(prompt_bufnr, map)
       action_set.select:replace(refile)
-      map("i", "<c-space>", depth_toggle)
+      map("i", "<c-space>", gen_depth_toggle(opts, prompt_bufnr))
       return true
     end,
   }):find()
