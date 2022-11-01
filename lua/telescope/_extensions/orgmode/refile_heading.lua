@@ -6,7 +6,7 @@ local actions = require("telescope.actions")
 local action_state = require("telescope.actions.state")
 local state = require("telescope.state")
 
-local utils = require('orgmode-telescope.utils')
+local utils = require('telescope-orgmode.utils')
 
 local Files = require('orgmode.parser.files')
 local Capture = require('orgmode.capture')

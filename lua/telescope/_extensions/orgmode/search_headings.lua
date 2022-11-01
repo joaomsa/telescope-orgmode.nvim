@@ -2,7 +2,7 @@ local pickers = require("telescope.pickers")
 local finders = require("telescope.finders")
 local conf = require("telescope.config").values
 
-local utils = require('orgmode-telescope.utils')
+local utils = require('telescope-orgmode.utils')
 
 return function(opts)
     opts = opts or {}
