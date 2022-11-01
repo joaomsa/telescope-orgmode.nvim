@@ -14,10 +14,11 @@ return function(opts)
   opts = opts or {}
 
   -- TODO: this should be included in return from Files.get_current_file
-  local has_capture, is_capture = pcall(vim.api.nvim_buf_get_var, 0, 'org_capture')
+  local is_capture = vim.F.npcall(vim.api.nvim_buf_get_var, 0, 'org_capture')
 
   local src_file = Files.get_current_file()
-  local src_item = src_file:get_closest_headline()
+  -- In capture, refile top level heading even if cursor closer to a subheading
+  local src_item = is_capture and src_file:get_headlines()[1] or src_file:get_closest_headline()
   local src_lines = src_file:get_headline_lines(src_item)
 
   local function refile(prompt_bufnr)
@@ -39,13 +40,11 @@ return function(opts)
         return false
       end
       --utils.echo_info(string.format('Wrote %s', dst_file.filename))
-      --return true
     else
-      --return Capture:_refile_to_end(dst_file.filename, src_lines, src_item)
       Capture:_refile_to_end(dst_file.filename, src_lines, src_item)
     end
 
-    if has_capture and is_capture then
+    if is_capture then
       Capture:kill()
     end
   end
