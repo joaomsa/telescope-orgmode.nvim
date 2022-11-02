@@ -5,7 +5,13 @@ Integration for [orgmode](https://github.com/nvim-orgmode/orgmode) with
 
 ## Demo
 
-TODO
+Jump to to any heading in `org_agenda_files` with `:Telescope orgmode search_headings`
+
+[![asciicast](https://asciinema.org/a/Oko0GT32HS6JCpzuSznUG0D1D.svg)](https://asciinema.org/a/Oko0GT32HS6JCpzuSznUG0D1D)
+
+Refile heading from capture or current file under destination with `:Telescope orgmode refile_heading`
+
+[![asciicast](https://asciinema.org/a/1X4oG6s5jQZrJJI3DfEzJU3wN.svg)](https://asciinema.org/a/1X4oG6s5jQZrJJI3DfEzJU3wN)
 
 ## Setup
 
