@@ -25,8 +25,8 @@ utils.get_entries = function(opts)
         local agenda_file = orgmode.load(file_entry.filename)
         for _, headline in ipairs(agenda_file.headlines) do
 
-            local allowed_depth = opts.max_depth == nil or headline._section.level <= opts.max_depth
-            local allowed_archive = opts.archived or not headline._section:is_archived()
+            local allowed_depth = opts.max_depth == nil or headline.level <= opts.max_depth
+            local allowed_archive = opts.archived or not headline.is_archived
             if allowed_depth and allowed_archive then
                 local entry = {
                     file = file_entry.file,
@@ -65,7 +65,7 @@ utils.make_entry = function(opts)
         if headline then
             lnum = headline.position.start_line
             location = string.format('%s:%i', location, lnum)
-            line = string.format('%s %s', string.rep('*', headline._section.level), headline.title)
+            line = string.format('%s %s', string.rep('*', headline.level), headline.title)
         end
 
         return {

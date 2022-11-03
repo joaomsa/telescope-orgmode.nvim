@@ -30,11 +30,11 @@ return function(opts)
     local dst_headline = entry.value.headline
     if dst_headline then
       -- NOTE: adapted from Capture:refile_to_headline
-      if src_item and src_item.level <= dst_headline._section.level then
+      if src_item and src_item.level <= dst_headline.level then
         -- Refiling in same file just moves the lines from one position
         -- to another,so we need to apply demote instantly
         local is_same_file = dst_file.filename == src_item.root.filename
-        src_lines = src_item:demote(dst_headline._section.level - src_item.level + 1, true, not is_same_file)
+        src_lines = src_item:demote(dst_headline.level - src_item.level + 1, true, not is_same_file)
       end
       local refiled = Capture:_refile_to(dst_file.filename, src_lines, src_item, dst_headline.position.end_line)
       if not refiled then
