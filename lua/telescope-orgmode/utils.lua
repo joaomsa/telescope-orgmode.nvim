@@ -22,8 +22,7 @@ utils.get_entries = function(opts)
 
     local results = {}
     for _, file_entry in ipairs(file_results) do
-        local agenda_file = orgmode.load(file_entry.filename)
-        for _, headline in ipairs(agenda_file.headlines) do
+        for _, headline in ipairs(file_entry.file.headlines) do
 
             local allowed_depth = opts.max_depth == nil or headline.level <= opts.max_depth
             local allowed_archive = opts.archived or not headline.is_archived
