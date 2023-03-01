@@ -26,7 +26,7 @@ To replace the default refile prompt:
 ```lua
 vim.api.nvim_create_autocmd('FileType', {
   pattern = 'org',
-  group = vim.api.nvim_create_augroup('orgmode_telescope_nvim', { clear = true })
+  group = vim.api.nvim_create_augroup('orgmode_telescope_nvim', { clear = true }),
   callback = function()
     vim.keymap.set('n', '<leader>or', require('telescope').extensions.orgmode.refile_heading)
   end,
