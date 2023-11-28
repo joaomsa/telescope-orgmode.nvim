@@ -8,8 +8,10 @@ local state = require("telescope.state")
 
 local utils = require('telescope-orgmode.utils')
 
+local orgmode = require('orgmode')
 local Files = require('orgmode.parser.files')
 local Capture = require('orgmode.capture')
+local Range = require('orgmode.parser.range')
 
 return function(opts)
   opts = opts or {}
@@ -36,17 +38,23 @@ return function(opts)
         local is_same_file = dst_file.filename == src_item.root.filename
         src_lines = src_item:demote(dst_headline.level - src_item.level + 1, true, not is_same_file)
       end
-      local refiled = Capture:_refile_to(dst_file.filename, src_lines, src_item, dst_headline.position.end_line)
+      refile_opts = {
+        file = dst_file.filename,
+        lines = src_lines,
+        item = src_item,
+        range = Range.from_line(dst_headline.position.end_line),
+        headline = dst_headline.position.end_line,
+      }
+      local refiled = Capture:_refile_to(refile_opts)
       if not refiled then
         return false
       end
-      --utils.echo_info(string.format('Wrote %s', dst_file.filename))
     else
       Capture:_refile_to_end(dst_file.filename, src_lines, src_item)
     end
 
     if is_capture then
-      Capture:kill()
+      orgmode.action('capture.kill')
     end
   end
 
