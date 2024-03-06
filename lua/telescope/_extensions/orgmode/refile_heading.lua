@@ -8,7 +8,7 @@ local state = require("telescope.state")
 
 local utils = require('telescope-orgmode.utils')
 
-local Files = require('orgmode.parser.files')
+local Files = require('orgmode.api')
 local Capture = require('orgmode.capture')
 
 return function(opts)
